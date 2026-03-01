@@ -95,18 +95,23 @@
                 const formData = new FormData(form);
                 
                 try {
-                    await fetch(form.action, {
+                    const response = await fetch(form.action, {
                         method: 'POST',
-                        body: formData,
-                        mode: 'no-cors' // Important for many form handlers to prevent errors
+                        body: new URLSearchParams(formData)
                     });
 
-                    form.style.display = 'none'; // Hide the form
-                    successMsg.classList.remove('hidden'); // Show the success message
+                    if (response.ok) {
+                        form.style.display = 'none'; // Hide the form
+                        successMsg.classList.remove('hidden'); // Show the success message
+                    } else {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Submission failed');
+                    }
 
                 } catch (error) {
                     btn.innerText = "Error. Try again.";
                     btn.disabled = false;
+                    console.error('Waitlist submission error:', error);
                 }
             });
         </script>
